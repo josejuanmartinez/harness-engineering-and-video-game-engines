@@ -1,0 +1,44 @@
+{
+  "CRASH-4ad56e35": {
+    "key": "CRASH-4ad56e35",
+    "title": "[rendering] GPU out-of-memory during stadium intro cutscene (CR-1007)",
+    "body": "Crash: CR-1007 (build 8126, PS5), 61 occurrences. Severity: critical (label from triage).\nSignal: Out of GPU memory (VRAM 12.4 GB of 12.5 GB).\nLikely cause: texture streaming pool over budget during the stadium intro cutscene.\nStack:\n  Engine/RHI/GpuAllocator.cpp:301 Allocate\n  Engine/Render/TextureStreamer.cpp:145 UploadMip\nLog: \"Streaming pool exceeded budget during stadium intro cutscene\".\nNote: no CUDA-specific report exists in the crash database; this ticket is for the closest match (GPU OOM, CR-1007).",
+    "owner": "Rendering",
+    "created_at": "2026-11-07T17:00:54+00:00"
+  },
+  "CRASH-2e1c200a": {
+    "key": "CRASH-2e1c200a",
+    "title": "[rendering] GPU out of memory during texture streaming in stadium intro cutscene (CR-1007)",
+    "body": "Crash: CR-1007 | Build 8126 | PS5 | Severity: critical | Occurrences: 61\n\nSignal: Out of GPU memory (VRAM 12.4 GB of 12.5 GB)\n\nStack:\n- Engine/RHI/GpuAllocator.cpp:301 Allocate\n- Engine/Render/TextureStreamer.cpp:145 UploadMip\n\nLog: Streaming pool exceeded budget during stadium intro cutscene\n\nLikely cause: Texture streaming pool over budget in the cutscene (per existing triage label, confidence unverified).\n\nNote: No crash reports contain the literal \"CUDA OOM\" string; the closest match is this GPU/VRAM out-of-memory report (CR-1007), which is the basis for this ticket. Please confirm if a different report was intended.",
+    "owner": "Rendering",
+    "created_at": "2026-11-07T17:01:21+00:00"
+  },
+  "CRASH-840df102": {
+    "key": "CRASH-840df102",
+    "title": "[rendering] GPU out of memory during texture upload in stadium intro cutscene (CR-1007)",
+    "body": "Crash report: CR-1007 (build 8126, PS5), 61 occurrences.\nSeverity: critical. Subsystem: rendering.\nSignal: Out of GPU memory (VRAM 12.4 GB of 12.5 GB).\nLikely cause: texture streaming pool exceeds budget during the stadium intro cutscene.\nStack:\n  Engine/RHI/GpuAllocator.cpp:301 Allocate\n  Engine/Render/TextureStreamer.cpp:145 UploadMip\nLog: \"Streaming pool exceeded budget during stadium intro cutscene\"",
+    "owner": "Rendering",
+    "created_at": "2026-11-07T17:01:46+00:00"
+  },
+  "CRASH-cb5954a9": {
+    "key": "CRASH-cb5954a9",
+    "title": "[rendering] GPU out-of-memory during texture streaming in stadium intro cutscene (CR-1007)",
+    "body": "Crash: CR-1007 | Build 8126 | Platform PS5 | Occurrences: 61 | Severity: critical (per triage label)\nSignal: Out of GPU memory (VRAM 12.4 GB of 12.5 GB)\nLikely cause: Texture streaming pool exceeds VRAM budget during the stadium intro cutscene.\nStack:\n  Engine/RHI/GpuAllocator.cpp:301 Allocate\n  Engine/Render/TextureStreamer.cpp:145 UploadMip\nLog: Streaming pool exceeded budget during stadium intro cutscene.\nNote: No report explicitly matching \"CUDA OOM\" was found; CR-1007 is the closest match (GPU/VRAM OOM). Please confirm it is the intended crash.",
+    "owner": "Rendering",
+    "created_at": "2026-11-07T17:04:18+00:00"
+  },
+  "CRASH-32bec689": {
+    "key": "CRASH-32bec689",
+    "title": "[rendering] Out of GPU memory in TextureStreamer UploadMip during stadium intro cutscene (CR-1007)",
+    "body": "Crash: CR-1007. Build 8126, platform PS5. Severity: critical (label). Occurrences: 61.\nSignal: Out of GPU memory (VRAM 12.4 GB of 12.5 GB).\nStack: Engine/RHI/GpuAllocator.cpp:301 Allocate <- Engine/Render/TextureStreamer.cpp:145 UploadMip.\nLog: Streaming pool exceeded budget during stadium intro cutscene.\nLikely cause: texture streaming pool over budget in the cutscene (per triage label). Note: no CUDA-specific reports were found; this is the only GPU out-of-memory report in the crash database.",
+    "owner": "Rendering",
+    "created_at": "2026-11-07T17:08:01+00:00"
+  },
+  "CRASH-d8a08a85": {
+    "key": "CRASH-d8a08a85",
+    "title": "[rendering] Out of GPU memory in texture streaming during stadium intro cutscene (CR-1007)",
+    "body": "Crash: CR-1007 (build 8126, PS5), 61 occurrences. Severity: critical (per triage label).\nSignal: Out of GPU memory (VRAM 12.4 GB of 12.5 GB).\nLikely cause: texture streaming pool exceeds budget during the stadium intro cutscene.\nStack:\n  Engine/RHI/GpuAllocator.cpp:301 Allocate\n  Engine/Render/TextureStreamer.cpp:145 UploadMip\nLog: \"Streaming pool exceeded budget during stadium intro cutscene\".\nRelated: CR-1008 (SIGSEGV in PoolAllocator Free, PC build 8127) is a separate issue, not confirmed related.",
+    "owner": "Rendering",
+    "created_at": "2026-11-07T17:08:30+00:00"
+  }
+}

@@ -1,0 +1,12 @@
+anthropic
+openai
+mcp
+pydantic
+python-dotenv
+fastapi
+uvicorn
+rank-bm25
+numpy
+requests
+tree-sitter
+tree-sitter-cpp

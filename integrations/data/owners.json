@@ -1,0 +1,8 @@
+{
+  "rendering": {"team": "Rendering", "lead": "alice", "paths": ["Engine/Render/", "Engine/RHI/", "Shaders/"]},
+  "physics": {"team": "Physics", "lead": "bruno", "paths": ["Engine/Physics/"]},
+  "animation": {"team": "Animation", "lead": "chen", "paths": ["Engine/Animation/"]},
+  "audio": {"team": "Audio", "lead": "dana", "paths": ["Engine/Audio/"]},
+  "online": {"team": "Online Services", "lead": "elif", "paths": ["Engine/Net/", "Game/Matchmaking/"]},
+  "tools": {"team": "Editor Tools", "lead": "femi", "paths": ["Editor/", "Tools/"]}
+}

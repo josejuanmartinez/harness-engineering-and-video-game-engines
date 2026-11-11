@@ -1,0 +1,16 @@
+# Build outputs
+*.exe
+*.obj
+*.pdb
+*.ilk
+
+# Python
+__pycache__/
+.venv/
+.env
+
+# Generated at runtime
+integrations/.agent_runs.sqlite
+integrations/data/rag_index.json
+integrations/09_context_and_caching_results.json
+integrations/traces/
