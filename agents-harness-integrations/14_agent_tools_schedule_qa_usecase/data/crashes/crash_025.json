@@ -1,0 +1,14 @@
+{
+  "file": "src/physics/PhysicsWorld.cpp:22",
+  "stacktrace": [
+    "PhysicsWorld::removeBody (src/physics/PhysicsWorld.cpp:22)",
+    "Player::respawn (src/gameplay/Player.cpp:26)",
+    "Game::Game()::<lambda(RigidBody&, RigidBody&)> (src/core/Game.cpp:18)",
+    "PhysicsWorld::detectCollisions (src/physics/PhysicsWorld.cpp:54)",
+    "PhysicsWorld::step (src/physics/PhysicsWorld.cpp:28)",
+    "Game::tick (src/core/Game.cpp:29)",
+    "Game::run (src/core/Game.cpp:38)",
+    "main (src/main.cpp:5)"
+  ],
+  "assigned_team": "Gameplay"
+}

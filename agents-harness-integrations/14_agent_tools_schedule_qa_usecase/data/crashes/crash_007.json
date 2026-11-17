@@ -1,0 +1,11 @@
+{
+  "file": "src/physics/PhysicsWorld.cpp:47",
+  "stacktrace": [
+    "PhysicsWorld::detectCollisions (src/physics/PhysicsWorld.cpp:47)",
+    "PhysicsWorld::step (src/physics/PhysicsWorld.cpp:28)",
+    "Game::tick (src/core/Game.cpp:29)",
+    "Game::run (src/core/Game.cpp:38)",
+    "main (src/main.cpp:5)"
+  ],
+  "assigned_team": "Physics"
+}

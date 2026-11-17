@@ -1,0 +1,9 @@
+{
+  "file": "src/net/NetSession.cpp:25",
+  "stacktrace": [
+    "NetSession::handlePacket (src/net/NetSession.cpp:25)",
+    "NetThread::pump (libnet.so+0x4a1f)",
+    "start_thread (libc.so.6+0x94ac3)"
+  ],
+  "assigned_team": "Online"
+}

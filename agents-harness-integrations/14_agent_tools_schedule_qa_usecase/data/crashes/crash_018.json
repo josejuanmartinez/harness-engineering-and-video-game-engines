@@ -1,0 +1,12 @@
+{
+  "file": "src/net/NetSession.cpp:18",
+  "stacktrace": [
+    "NetSession::disconnect (src/net/NetSession.cpp:18)",
+    "NetSession::onTimeout (src/net/NetSession.cpp:44)",
+    "NetSession::tick (src/net/NetSession.cpp:37)",
+    "Game::tick (src/core/Game.cpp:30)",
+    "Game::run (src/core/Game.cpp:38)",
+    "main (src/main.cpp:5)"
+  ],
+  "assigned_team": null
+}

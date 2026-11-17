@@ -1,0 +1,10 @@
+{
+  "file": "src/gameplay/Player.cpp:12",
+  "stacktrace": [
+    "Player::update (src/gameplay/Player.cpp:12)",
+    "Game::tick (src/core/Game.cpp:25)",
+    "Game::run (src/core/Game.cpp:38)",
+    "main (src/main.cpp:5)"
+  ],
+  "assigned_team": null
+}

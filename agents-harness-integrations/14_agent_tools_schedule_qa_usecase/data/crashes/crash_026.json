@@ -1,0 +1,11 @@
+{
+  "file": "src/audio/AudioMixer.cpp:10",
+  "stacktrace": [
+    "AudioMixer::playSound (src/audio/AudioMixer.cpp:10)",
+    "Player::attack (src/gameplay/Player.cpp:22)",
+    "Game::tick (src/core/Game.cpp:27)",
+    "Game::run (src/core/Game.cpp:38)",
+    "main (src/main.cpp:5)"
+  ],
+  "assigned_team": "Audio"
+}

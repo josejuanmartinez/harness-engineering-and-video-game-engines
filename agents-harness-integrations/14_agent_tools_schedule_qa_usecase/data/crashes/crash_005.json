@@ -1,0 +1,12 @@
+{
+  "file": "src/physics/PhysicsWorld.cpp:32",
+  "stacktrace": [
+    "PhysicsWorld::inverseMass (src/physics/PhysicsWorld.cpp:32)",
+    "PhysicsWorld::integrate (src/physics/PhysicsWorld.cpp:38)",
+    "PhysicsWorld::step (src/physics/PhysicsWorld.cpp:27)",
+    "Game::tick (src/core/Game.cpp:29)",
+    "Game::run (src/core/Game.cpp:38)",
+    "main (src/main.cpp:5)"
+  ],
+  "assigned_team": "Physics"
+}

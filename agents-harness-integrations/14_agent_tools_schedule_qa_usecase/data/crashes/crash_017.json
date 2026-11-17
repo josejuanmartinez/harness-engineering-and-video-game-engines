@@ -1,0 +1,11 @@
+{
+  "file": "src/gameplay/Inventory.cpp:28",
+  "stacktrace": [
+    "Inventory::get (src/gameplay/Inventory.cpp:28)",
+    "Player::equipSelected (src/gameplay/Player.cpp:16)",
+    "Game::tick (src/core/Game.cpp:26)",
+    "Game::run (src/core/Game.cpp:38)",
+    "main (src/main.cpp:5)"
+  ],
+  "assigned_team": "Gameplay"
+}

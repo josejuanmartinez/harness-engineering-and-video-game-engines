@@ -1,0 +1,10 @@
+{
+  "file": "src/save/SaveSystem.cpp:33",
+  "stacktrace": [
+    "std::__throw_invalid_argument (libstdc++.so.6+0xa1b2c)",
+    "SaveSystem::load (src/save/SaveSystem.cpp:33)",
+    "Game::Game (src/core/Game.cpp:5)",
+    "main (src/main.cpp:4)"
+  ],
+  "assigned_team": "Platform"
+}
