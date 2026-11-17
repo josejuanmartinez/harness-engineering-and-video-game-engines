@@ -1,0 +1,271 @@
+[
+  {
+    "strategy": "cache_roto",
+    "total": {
+      "requests": 4,
+      "input": 12,
+      "output": 2848,
+      "cache_read": 0,
+      "cache_write": 22305,
+      "cost": 0.168533,
+      "latency": 33.93181189993629,
+      "context": 9065,
+      "dropped_thinking": 5,
+      "cleared_tokens": 0,
+      "compactions": 0,
+      "notes": []
+    },
+    "cache_hit": 0.0,
+    "quality": {
+      "score": null,
+      "detail": "conversación incompleta"
+    },
+    "turns": [
+      {
+        "requests": 2,
+        "input": 6,
+        "output": 1246,
+        "cache_read": 0,
+        "cache_write": 6831,
+        "cost": 0.059099,
+        "latency": 16.420625399972778,
+        "context": 5236,
+        "dropped_thinking": 1,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": []
+      },
+      {
+        "requests": 2,
+        "input": 6,
+        "output": 1602,
+        "cache_read": 0,
+        "cache_write": 15474,
+        "cost": 0.109434,
+        "latency": 17.511186499963515,
+        "context": 9065,
+        "dropped_thinking": 4,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": []
+      }
+    ],
+    "final_answer": "## Qué pide `01_unique_ptr.cpp`\nTienes que implementar `UniquePtr<T>` **sin `<memory>`** en 20 minutos (l. 2-3):\n- Constructor desde `T*`, destructor, `operator*`, `operator->` y `operator bool` (l. 9).\n- Copia borrada con `= delete` y move ctor/assign marcados `noexcept` (l. 10-11).\n- `get()`, `release()`, `reset(T* = nullptr)` y `make_unique` con `std::forward` (l. 12-13).\n- Tests: un contador estático de objetos vivos que siempre vuelva a 0, self-move y que `reset()` destruya el objeto anterior (l. 16-18).\n\n`00_repaso/soluciones/12_smart_pointers.cpp` no implementa ningún puntero inteligente: **usa** los de la librería estándar. Te sirve para ver la semántica que tienes que imitar.\n- **Lista enlazada:** cada nodo es dueño del siguiente con `unique_ptr`. En `pop_front`, `head_ = std::move(head_->next)` (l. 39) es seguro porque el move assignment primero hace `release()` del origen y después borra el nodo antiguo. Tu `UniquePtr` debe respetar ese mismo orden.\n- **Árbol:** el padre posee a los hijos con `shared_ptr` y cada hijo apunta a su padre con `weak_ptr`, así no se forman ciclos (l. 63-67). El test de las l. 101-110 lo comprueba.\n\n## Fallos que busca el entrevistador\n1. **Self-move:** si haces `delete ptr_; ptr_ = o.ptr_;` sin comprobar `this != &o`, en `p = std::move(p)` acabas con un puntero colgante. Alternativa: `reset(o.release())`.\n2. **Orden en `reset`:** primero `T* old = ptr_; ptr_ = p;` y luego `delete old;`. Si borras antes de reasignar, un destructor que vuelva a acceder al puntero ve un objeto ya destruido.\n3. **Moved-from:** el origen tiene que quedar a `nullptr`; si no, hay double delete.\n4. **`noexcept`:** si los moves no lo son, `std::vector` copia en vez de mover al crecer (`move_if_noexcept`). Aquí además no compilaría, porque la copia está borrada.\n5. **`release()`** devuelve el puntero sin borrarlo; si se confunde con `reset()`, hay leak o double free.\n6. **`explicit`** en el constructor desde `T*` y en `operator bool`, para evitar conversiones implícitas peligrosas.\n7. **`make_unique`:** `new T(std::forward<Args>(args)...)`. Si te olvidas de `forward`, los argumentos se copian. Antes de C++17, `f(unique_ptr<A>(new A), g())` podía perder memoria si `g()` lanzaba.\n8. **`T[]`:** tiene que llamar a `delete[]`, no a `delete` (follow-up, l. 25).\n\nOjo con la lista enlazada (l. 26-60): no tiene destructor propio, así que con millones de nodos la destrucción es recursiva y puede desbordar la pila. La solución es un destructor iterativo.\n\n¿Te pongo el temporizador de 20 minutos y lo escribes tú?"
+  },
+  {
+    "strategy": "cache",
+    "total": {
+      "requests": 4,
+      "input": 8,
+      "output": 2503,
+      "cache_read": 13240,
+      "cache_write": 9057,
+      "cost": 0.098025,
+      "latency": 27.61561380000785,
+      "context": 9059,
+      "dropped_thinking": 0,
+      "cleared_tokens": 0,
+      "compactions": 0,
+      "notes": []
+    },
+    "cache_hit": 0.5935888814167227,
+    "quality": {
+      "score": null,
+      "detail": "conversación incompleta"
+    },
+    "turns": [
+      {
+        "requests": 2,
+        "input": 4,
+        "output": 1167,
+        "cache_read": 1599,
+        "cache_write": 5234,
+        "cost": 0.049845799999999996,
+        "latency": 12.615558499994222,
+        "context": 5236,
+        "dropped_thinking": 0,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": []
+      },
+      {
+        "requests": 2,
+        "input": 4,
+        "output": 1336,
+        "cache_read": 11641,
+        "cache_write": 3823,
+        "cost": 0.0481792,
+        "latency": 15.000055300013628,
+        "context": 9059,
+        "dropped_thinking": 0,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": []
+      }
+    ],
+    "final_answer": "**Qué pide `01_unique_ptr.cpp`**\n\nImplementar `UniquePtr<T>` sin incluir `<memory>` (líneas 9-13). Tiene que tener:\n- Constructor desde `T*`, destructor, `operator*`, `operator->` y `explicit operator bool`.\n- La copia borrada con `= delete`, y el move constructor y el move assignment marcados como `noexcept`.\n- `get()`, `release()` y `reset(T* = nullptr)`.\n- `make_unique` con `std::forward`.\n\nLos tests (líneas 16-18) son tres: un contador estático de objetos vivos que vuelve a 0, que el self-move no rompa nada y que `reset()` destruya el objeto anterior.\n\n**Qué aporta el repaso 12**\n\nPractica cómo se *usan* los smart pointers. Hay dos patrones que merece la pena llevar aprendidos:\n- `head_ = std::move(head_->next)` (línea 39) es seguro porque el move assignment equivale a `reset(r.release())`: primero se saca `next` y después se borra el nodo antiguo.\n- Para romper el ciclo, el hijo guarda a su padre con `weak_ptr` (líneas 65 y 83).\n\nUn detalle que el archivo no trata: el destructor de `LinkedList` es recursivo. Con una lista de millones de nodos se desborda la pila. Si te lo preguntan, la solución es un destructor iterativo.\n\n**Fallos que busca el entrevistador**\n- **Self-move.** Si haces `delete ptr_; ptr_ = o.ptr_;` sin comprobar `this != &o`, destruyes el objeto y te quedas con un puntero colgante. Para que sea seguro, usa `reset(o.release())`.\n- **Orden en `reset`.** Primero guarda el puntero viejo, luego asigna el nuevo y al final borra el viejo. Así, si el destructor de `T` vuelve a entrar en el puntero, no ve un estado roto.\n- **Olvidar `noexcept`.** Sin él, `std::vector` usa `move_if_noexcept` y al crecer copia en vez de mover. Con un tipo que no se puede copiar, ni siquiera compila.\n- **Dejar el origen sin anular** tras el move, lo que acaba en un double free.\n- **`operator bool` sin `explicit`**, que permite conversiones implícitas absurdas como `p + 1`.\n- **`std::move` en vez de `std::forward`** en `make_unique`, o los argumentos sin `Args&&...`.\n- **Follow-ups** (líneas 21-25):\n  - Un `unique_ptr` con el deleter por defecto ocupa lo mismo que un `T*`, gracias a EBO o a `[[no_unique_address]]` en C++20. Con un deleter que tiene estado, ocupa más.\n  - `shared_ptr` tiene un control block y un refcount atómico. `make_shared` reserva el objeto y el control block en una sola asignación.\n  - Para `T[]` hace falta `delete[]`.\n\n¿Lo escribes tú en 20 minutos y luego lo reviso?"
+  },
+  {
+    "strategy": "truncado",
+    "total": {
+      "requests": 4,
+      "input": 8,
+      "output": 2721,
+      "cache_read": 8069,
+      "cache_write": 9674,
+      "cost": 0.1044358,
+      "latency": 30.344561200006865,
+      "context": 7588,
+      "dropped_thinking": 2,
+      "cleared_tokens": 0,
+      "compactions": 0,
+      "notes": [
+        "truncados 5603 chars"
+      ]
+    },
+    "cache_hit": 0.45456593994704525,
+    "quality": {
+      "score": null,
+      "detail": "conversación incompleta"
+    },
+    "turns": [
+      {
+        "requests": 2,
+        "input": 4,
+        "output": 1085,
+        "cache_read": 3172,
+        "cache_write": 3661,
+        "cost": 0.0406554,
+        "latency": 11.809060500003397,
+        "context": 5236,
+        "dropped_thinking": 0,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": []
+      },
+      {
+        "requests": 2,
+        "input": 4,
+        "output": 1636,
+        "cache_read": 4897,
+        "cache_write": 6013,
+        "cost": 0.0637804,
+        "latency": 18.535500700003468,
+        "context": 7588,
+        "dropped_thinking": 2,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": [
+          "truncados 5603 chars"
+        ]
+      }
+    ],
+    "final_answer": "**Qué se pide** (`01_unique_ptr.cpp`, l.5-18): escribir `UniquePtr<T>` en C++20 sin `<memory>`. Debe tener:\n- constructor desde `T*`, destructor, `operator*`, `operator->` y `operator bool`;\n- copia borrada con `= delete`, y move constructor y move assignment, los dos `noexcept`;\n- `get()`, `release()`, `reset(T* = nullptr)` y `make_unique` con `std::forward`;\n- tests con un contador estático de objetos vivos, un self-move y `reset()`.\n\nLa solución `00_repaso/soluciones/12_smart_pointers.cpp` no implementa un `unique_ptr`: usa los de la librería estándar. Sirve para entender el ownership:\n- una lista donde cada nodo es dueño del siguiente (l.25-60);\n- un árbol que evita ciclos de `shared_ptr` porque cada hijo guarda a su padre con `weak_ptr` (l.13-14, 62-85).\n\n**Fallos que buscará el entrevistador:**\n- **Self-move:** si haces `delete ptr_` antes de quedarte con `other.ptr_`, `p = std::move(p)` destruye el objeto. Comprueba `this != &other` o usa el patrón swap.\n- **Move que deja al origen apuntando al objeto:** si no pones `other.ptr_ = nullptr`, el objeto se libera dos veces (double free). ASan lo detecta.\n- **`reset()` en mal orden:** guarda el puntero viejo, asigna el nuevo y borra el viejo al final. Así funciona aunque el destructor de `T` vuelva a entrar en el puntero (reentrada).\n- **`release()`:** devuelve el puntero sin borrarlo y deja el interno a null. Confundirlo con `reset()` produce una fuga.\n- **Falta de `noexcept`:** al crecer, `vector` usa `move_if_noexcept`. Si el move puede lanzar excepciones, intenta copiar, y en un tipo move-only perderías la garantía fuerte (follow-up de la l.21).\n- **`operator bool` sin `explicit`:** permite conversiones implícitas absurdas, como `p + 1`.\n- **Forwarding:** escribir `Args&&...` + `std::forward<Args>(args)...`, no `std::move`.\n\n**Respuestas rápidas a los follow-ups:**\n- Con el deleter por defecto ocupa lo mismo que un puntero crudo (en la librería estándar, gracias a EBO). Un deleter con estado añade su tamaño.\n- `make_unique` evita un `new` suelto en el código. Antes de C++17 también evitaba fugas por el orden de evaluación de los argumentos.\n\n**Corrección del turno anterior:** la lectura del `README.md` llegó cortada en la línea 6. Lo que te conté de las líneas 10-78 (sanitizers, WSL, ruta mínima) no lo saqué del texto que leí. Lo vuelvo a leer completo antes de que te apoyes en ello. El listado de archivos sí está confirmado ahora."
+  },
+  {
+    "strategy": "compaction",
+    "total": {
+      "requests": 4,
+      "input": 8,
+      "output": 2636,
+      "cache_read": 14835,
+      "cache_write": 7774,
+      "cost": 0.09458899999999999,
+      "latency": 27.796659599989653,
+      "context": 9173,
+      "dropped_thinking": 0,
+      "cleared_tokens": 0,
+      "compactions": 0,
+      "notes": []
+    },
+    "cache_hit": 0.6559225361453773,
+    "quality": {
+      "score": null,
+      "detail": "conversación incompleta"
+    },
+    "turns": [
+      {
+        "requests": 2,
+        "input": 4,
+        "output": 1239,
+        "cache_read": 3038,
+        "cache_write": 3879,
+        "cost": 0.044798599999999994,
+        "latency": 12.813951899996027,
+        "context": 5278,
+        "dropped_thinking": 0,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": []
+      },
+      {
+        "requests": 2,
+        "input": 4,
+        "output": 1397,
+        "cache_read": 11797,
+        "cache_write": 3895,
+        "cost": 0.0497904,
+        "latency": 14.982707699993625,
+        "context": 9173,
+        "dropped_thinking": 0,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": []
+      }
+    ],
+    "final_answer": "## Qué pide `01_unique_ptr.cpp` (l.1-25)\nHay que escribir un `UniquePtr<T>` **sin `<memory>`** en 20 minutos. Debe tener:\n- un constructor desde `T*`, el destructor, `operator*`, `operator->` y `operator bool`;\n- la copia borrada con `= delete` y el move constructor y el move assignment marcados `noexcept`;\n- `get()`, `release()` y `reset(T* = nullptr)`;\n- un `make_unique` con perfect forwarding.\n\nLos tests que pide son un contador estático de objetos vivos que siempre vuelva a 0, el self-move `p = std::move(p)` y comprobar que `reset()` destruye el objeto anterior.\n\n## Lo que enseña la solución de repaso (`00_repaso/soluciones/12_smart_pointers.cpp`)\n- **l.39:** `head_ = std::move(head_->next)` funciona porque el move assignment de `std::unique_ptr` hace `reset(r.release())`: primero se queda con el puntero y después borra el nodo antiguo. **Tu move assignment tiene que respetar ese orden.** Si borras primero, lees un `next` que ya está liberado y ASan te lo marcará como use-after-free.\n- **l.65:** el hijo guarda al padre con `weak_ptr` para no formar un ciclo de `shared_ptr`. En l.106-110 se comprueba con `use_count`.\n- **Ojo (no lo dice el archivo):** `LinkedList` destruye sus nodos de forma recursiva, así que con millones de nodos puede desbordar la pila. Es un follow-up clásico y se arregla con un destructor iterativo.\n\n## Fallos que buscará el entrevistador\n1. **Self-move:** si haces `delete ptr_; ptr_ = other.ptr_; other.ptr_ = nullptr;` con `this == &other`, el objeto termina destruido y además vacío. Lo seguro es `reset(other.release())` o comprobar `this != &other`.\n2. **`reset` en mal orden:** primero se guarda el puntero viejo, después se asigna el nuevo y por último se borra el viejo. Así el estado es coherente aunque el destructor de `T` vuelva a entrar en el puntero.\n3. **Olvidar el `noexcept`:** sin él, `std::vector` usa `move_if_noexcept` y al crecer copia en lugar de mover. Con la copia borrada directamente no compila.\n4. **No anular el origen** después de mover, lo que lleva a un double free.\n5. **Forwarding mal hecho:** escribir `std::move(args)...` en lugar de `std::forward<Args>(args)...`.\n6. **`operator bool` sin `explicit`:** permite conversiones implícitas absurdas, como `p + 1`.\n\nSobre los follow-ups: un `unique_ptr` con un deleter sin estado ocupa lo mismo que un puntero crudo gracias a EBO, o a `[[no_unique_address]]` desde C++20. Un `shared_ptr` ocupa dos punteros (objeto y control block) y su refcount es atómico.\n\n¿Quieres que te valide una implementación cuando la escribas?"
+  },
+  {
+    "strategy": "context_editing",
+    "total": {
+      "requests": 4,
+      "input": 8,
+      "output": 2491,
+      "cache_read": 14848,
+      "cache_write": 7519,
+      "cost": 0.09041660000000001,
+      "latency": 27.062232200056314,
+      "context": 9094,
+      "dropped_thinking": 0,
+      "cleared_tokens": 0,
+      "compactions": 0,
+      "notes": []
+    },
+    "cache_hit": 0.6635977653631285,
+    "quality": {
+      "score": null,
+      "detail": "conversación incompleta"
+    },
+    "turns": [
+      {
+        "requests": 2,
+        "input": 4,
+        "output": 1202,
+        "cache_read": 3172,
+        "cache_write": 3661,
+        "cost": 0.0429954,
+        "latency": 12.768122499983292,
+        "context": 5236,
+        "dropped_thinking": 0,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": []
+      },
+      {
+        "requests": 2,
+        "input": 4,
+        "output": 1289,
+        "cache_read": 11676,
+        "cache_write": 3858,
+        "cost": 0.047421200000000004,
+        "latency": 14.294109700073022,
+        "context": 9094,
+        "dropped_thinking": 0,
+        "cleared_tokens": 0,
+        "compactions": 0,
+        "notes": []
+      }
+    ],
+    "final_answer": "## Qué pide `01_unique_ptr.cpp`\n\nEn las líneas 9-13 pide un `UniquePtr<T>` sin `<memory>`:\n- Constructor desde `T*` (márcalo `explicit`, aunque el enunciado no lo exige), destructor, `operator*`, `operator->` y `explicit operator bool`.\n- Copia borrada con `= delete`.\n- Constructor y asignación de movimiento, los dos `noexcept`.\n- `get()`, `release()`, `reset(T* = nullptr)` y `make_unique` con `std::forward`.\n\nLos tests van en el `main` (líneas 16-18): un contador estático de objetos vivos que debe volver a 0, auto-movimiento (`p = std::move(p)`) y comprobar que `reset` destruye el objeto anterior.\n\n## Qué aporta el repaso 12\n\n`00_repaso/soluciones/12_smart_pointers.cpp` se centra en el uso, no en la implementación:\n- Una lista enlazada con `unique_ptr`. En la línea 39, `head_ = std::move(head_->next);` es seguro porque la asignación de movimiento equivale a `reset(r.release())`: primero se suelta `next` y después se borra el nodo viejo.\n- Un árbol en el que el hijo guarda a su padre con `weak_ptr` (línea 65) para no crear ciclos. El test de las líneas 101-110 lo comprueba.\n\n## Fallos que suele buscar el entrevistador\n\n- **Asignación de movimiento mal hecha.** `delete ptr_; ptr_ = o.ptr_;` sin comprobar si es el mismo objeto rompe el auto-movimiento. Usa `reset(o.release())` o comprueba `this != &o`.\n- **Origen sin anular.** Si no pones `o.ptr_ = nullptr` al mover, el objeto se borra dos veces y ASan lo detecta.\n- **Orden en `reset`.** Guarda el puntero viejo, asigna el nuevo y borra el viejo al final. Así un destructor que vuelva a entrar en el puntero no ve un estado a medias.\n- **Moves sin `noexcept`.** `vector` usa `move_if_noexcept`, así que al crecer copiaría (o no compilaría si no hay copia).\n- **`make_unique` sin `std::forward`** o con `T&&` donde hacía falta `Args&&...`.\n- **Tamaño.** Con el deleter por defecto ocupa lo mismo que un puntero crudo: en C++20 se consigue con `[[no_unique_address]]` y antes con EBO. Un deleter con estado lo hace crecer.\n- **Destrucción recursiva.** Una lista con `unique_ptr` muy larga puede desbordar la pila al destruirse. Es un follow-up típico de la línea 55 del repaso.\n\n¿Lo implementas tú y te lo reviso?"
+  }
+]
