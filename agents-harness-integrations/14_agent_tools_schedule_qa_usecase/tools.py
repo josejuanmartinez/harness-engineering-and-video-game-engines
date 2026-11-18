@@ -6,6 +6,7 @@ from anthropic.types import ToolParam
 from anthropic.types.tool_param import InputSchema
 from pydantic import TypeAdapter
 from type_definitions.data_types import Crash
+from anthropic import beta_tool
 
 # Every path the model passes is resolved relative to ROOT and must stay inside it.
 ROOT = (Path(__file__).parent / "data").resolve()
@@ -19,15 +20,15 @@ def _safe_path(path: str) -> Path:
         raise ValueError(f"Path '{path}' is outside the allowed directory.")
     return resolved
 
-
-def list_files(folder: str) -> list[str]:
+@beta_tool
+def list_files(folder: str) -> str:
     """List all the files in a folder, including those in its subfolders.
 
     Args:
         folder: Folder path relative to the project root, e.g. "src" or "crashes".
 
     Returns:
-        Sorted list of file paths relative to the project root, e.g. ["src/audio/AudioMixer.cpp", ...].
+        Sorted file paths relative to the project root, one per line, e.g. "src/audio/AudioMixer.cpp".
 
     Raises:
         ValueError: If the folder is outside the project root or is not a directory.
@@ -35,10 +36,10 @@ def list_files(folder: str) -> list[str]:
     base = _safe_path(folder)
     if not base.is_dir():
         raise ValueError(f"'{folder}' is not a directory.")
-    return sorted(p.relative_to(ROOT).as_posix() for p in base.rglob("*") if p.is_file())
+    return "\n".join(sorted(p.relative_to(ROOT).as_posix() for p in base.rglob("*") if p.is_file()))
 
-
-def show_lines_in_file(file: str, line_from: str|int, line_to: str|int) -> list[str]:
+@beta_tool
+def show_lines_in_file(file: str, line_from: str|int, line_to: str|int) -> str:
     """Return a range of lines of a file, from line_from to line_to, both included.
 
     Requires:
@@ -50,7 +51,7 @@ def show_lines_in_file(file: str, line_from: str|int, line_to: str|int) -> list[
         line_to: Last line to return (1-based, inclusive). At most 200 lines are returned per call.
 
     Returns:
-        List of lines, each prefixed with its line number, e.g. ["10: Voice& v = voices_[activeVoices_++];"].
+        The lines, one per line, each prefixed with its line number, e.g. "10: Voice& v = voices_[activeVoices_++];".
 
     Raises:
         ValueError: If the file is outside the project root, does not exist, or the range is invalid.
@@ -66,10 +67,10 @@ def show_lines_in_file(file: str, line_from: str|int, line_to: str|int) -> list[
         raise ValueError(f"Invalid line range {line_from}-{line_to}.")
     line_to = min(line_to, line_from + MAX_LINES - 1)
     lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
-    return [f"{n}: {lines[n - 1]}" for n in range(line_from, min(line_to, len(lines)) + 1)]
+    return "\n".join(f"{n}: {lines[n - 1]}" for n in range(line_from, min(line_to, len(lines)) + 1))
 
-
-def safe_grep(path: str, pattern: str) -> list[str]:
+@beta_tool
+def safe_grep(path: str, pattern: str) -> str:
     """Search a file, or every file in a folder and its subfolders, for a regular expression.
 
     Args:
@@ -77,7 +78,7 @@ def safe_grep(path: str, pattern: str) -> list[str]:
         pattern: Python regular expression to search for, e.g. "playSound".
 
     Returns:
-        List of matches as "path:line: text", e.g. ["src/audio/AudioMixer.cpp:8: void AudioMixer::playSound(...) {"].
+        Matches, one per line, as "path:line: text", e.g. "src/audio/AudioMixer.cpp:8: void AudioMixer::playSound(...) {".
         At most 100 matches are returned.
 
     Raises:
@@ -96,10 +97,10 @@ def safe_grep(path: str, pattern: str) -> list[str]:
             if regex.search(line):
                 matches.append(f"{f.relative_to(ROOT).as_posix()}:{n}: {line.strip()}")
                 if len(matches) >= MAX_GREP_RESULTS:
-                    return matches + [f"... truncated at {MAX_GREP_RESULTS} results"]
-    return matches
+                    return "\n".join(matches + [f"... truncated at {MAX_GREP_RESULTS} results"])
+    return "\n".join(matches)
 
-
+@beta_tool
 def find_folder_with_crashes() -> str:
     """Find the folder that holds the previous crash dumps.
 
@@ -124,8 +125,8 @@ def find_folder_with_crashes() -> str:
         raise ValueError("No folder with crash dumps found.")
     return max(counts, key=counts.get).relative_to(ROOT).as_posix()
 
-
-def count_duplicates(error: Crash, folder: str) -> int:
+@beta_tool
+def count_duplicates(error: Crash, folder: str) -> str:
     """Count how many previous crash dumps are duplicates of a crash. Use it to judge how frequent a crash is.
 
     A duplicate has the same file and the same stack trace; the assigned team is ignored.
@@ -152,10 +153,10 @@ def count_duplicates(error: Crash, folder: str) -> int:
             continue  # skip malformed dumps
         if other.file == error.file and other.stacktrace == error.stacktrace:
             count += 1
-    return count
+    return str(count)
 
-
-def calculate_priority(duplicates: int) -> int:
+@beta_tool
+def calculate_priority(duplicates: int) -> str:
     """Calculate the priority of a crash, from 1 (lowest) to 10 (highest), based on how often it happened before.
 
     Requires:
@@ -172,9 +173,9 @@ def calculate_priority(duplicates: int) -> int:
     """
     if duplicates < 0:
         raise ValueError(f"Invalid duplicates count {duplicates}.")
-    return min(10, 1 + 2 * duplicates)
+    return str(min(10, 1 + 2 * duplicates))
 
-
+@beta_tool
 def find_owner(error: Crash, folder: str) -> str:
     """Find the team that owns a crash, from the teams assigned to previous crashes in the same source file.
 
@@ -206,39 +207,5 @@ def find_owner(error: Crash, folder: str) -> str:
     return max(votes, key=votes.get)
 
 
-def _get_input_schema(fn) -> InputSchema:
-    """Build the JSON input schema of a function from its type-annotated parameters.
-
-    Args:
-        fn: The function to describe.
-
-    Returns:
-        JSON schema object with one property per parameter. Parameters without a default are required.
-
-    Raises:
-        TypeError: If a parameter has no type annotation.
-    """
-    properties = {}
-    required = []
-    for name, param in inspect.signature(fn).parameters.items():
-        if param.annotation is inspect.Parameter.empty:
-            raise TypeError(f"Parameter '{name}' of {fn.__name__} has no type annotation.")
-        # TypeAdapter turns any annotation (str, int, list[str], a BaseModel, ...) into JSON schema
-        properties[name] = TypeAdapter(param.annotation).json_schema()
-        if param.default is inspect.Parameter.empty:
-            required.append(name)
-    return {
-        "type": "object",
-        "properties": properties,
-        "required": required,
-        "additionalProperties": False,
-    }
-
 TOOLS = [list_files, show_lines_in_file, safe_grep, find_folder_with_crashes, count_duplicates,
          calculate_priority, find_owner]
-tool_definitions = [
-    ToolParam(input_schema=_get_input_schema(x), name=x.__name__, description=inspect.getdoc(x) or "", type="custom")
-    for x in TOOLS
-]
-TOOLS_BY_NAME = {fn.__name__: fn for fn in TOOLS}
-

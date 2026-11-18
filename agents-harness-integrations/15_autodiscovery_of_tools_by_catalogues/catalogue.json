@@ -1,0 +1,17 @@
+[
+  {
+    "name": "math",
+    "description": "Arithmetic: add, multiply and compute percentages of numbers.",
+    "module": "catalogues/math_tools.py"
+  },
+  {
+    "name": "text",
+    "description": "Text utilities: count words, reverse a string, convert to upper case.",
+    "module": "catalogues/text_tools.py"
+  },
+  {
+    "name": "dates",
+    "description": "Dates and time: current date/time, number of days between two dates, weekday of a date.",
+    "module": "catalogues/date_tools.py"
+  }
+]
